@@ -4,7 +4,7 @@ import sqlite3
 import time
 import random
 
-# driver for Google Chrome pipiska
+# driver for Google Chrome pipiska 112
 webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 driver = Chrome(webdriver)
 
