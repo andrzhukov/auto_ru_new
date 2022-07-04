@@ -4,7 +4,7 @@ import sqlite3
 import time
 import random
 
-# driver for Google Chrome pipiska 112
+# driver for Google Chrome
 webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 driver = Chrome(webdriver)
 
@@ -19,7 +19,7 @@ test_url = 'https://auto.ru/moskva/cars/bmw/3er/all/?top_days=1&year_from=2018&y
 dbase.execute('CREATE TABLE IF NOT EXISTS {}(Name, Link, Engine_Power, Year, Mileage, Price, Photo, Owner)'.format('test_cars'))
 dbase.commit()
 
-# Creating headers for request to auto.ru1
+# Creating headers for request to auto.ru
 def interceptor(request):
     del request.headers['Accept']
     del request.headers['Accept-Encoding']
