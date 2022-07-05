@@ -4,11 +4,11 @@ import sqlite3
 import time
 import random
 
-# driver for Google Chrome1
+# driver for Google Chrome
 webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 driver = Chrome(webdriver)
 
-# Creating database and cursor2
+# Creating database and cursor
 dbase = sqlite3.connect('auto_ru_cars.db')
 cur = dbase.cursor()
 
