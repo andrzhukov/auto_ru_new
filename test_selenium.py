@@ -5,7 +5,8 @@ import time
 import random
 
 # driver for Google Chrome
-webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
+#webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
+webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 driver = Chrome(webdriver)
 
 # Creating database and cursor
@@ -61,7 +62,7 @@ def interceptor(request):
                 cycada=nqH7+oUJczCSw/SzGMoOECKCXlp5wIMqb89bi8TJjIo='
     request.headers['Host'] = 'auto.ru'
     request.headers['User-Agent'] = 'Googlebot/2.1 (+http://www.google.com/bot.html)'
-    # request.headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
+    #request.headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
 
 driver.request_interceptor = interceptor
 # driver.get(url)
@@ -75,7 +76,7 @@ def get_page_number(first_url):
         numbers_of_pages = int(pages[-1].get_attribute('href').split('page=')[1])
     except IndexError:
         numbers_of_pages = 1
-    driver.close()
+   # driver.close()
     return numbers_of_pages
 
 # print(get_page_number())
@@ -123,7 +124,7 @@ def get_car_info_from_page(page_url):
     for i in range(len(car_names)):
         cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
                                car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
-    driver.close()
+    #driver.close()
     return cars_from_page
 
 # This function create list that include information about cars from all pages
@@ -177,7 +178,8 @@ def get_photo_owner(car_lst):
     driver.close()
     return car_lst
 
-print(get_car_info_from_all_pages(test_url))
-
+spisok = get_car_info_from_all_pages(test_url)
+print(spisok)
+write_info_to_db(spisok, 'test_cars')
 
 # driver.close()
