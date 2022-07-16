@@ -8,7 +8,7 @@ import random
 webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 driver = Chrome(webdriver)
 
-# Creating database and cursor 123
+# Creating database and cursor
 dbase = sqlite3.connect('auto_ru_cars.db')
 cur = dbase.cursor()
 
