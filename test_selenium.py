@@ -5,6 +5,7 @@ import time
 import random
 
 # driver for Google Chrome
+# for mac
 #webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 driver = Chrome(webdriver)
