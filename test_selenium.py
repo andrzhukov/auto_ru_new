@@ -6,8 +6,8 @@ import random
 
 # driver for Google Chrome
 # for mac
-#webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
-webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
+webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
+#webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 driver = Chrome(webdriver)
 
 # Creating database and cursor
@@ -179,8 +179,19 @@ def get_photo_owner(car_lst):
     driver.close()
     return car_lst
 
-spisok = get_car_info_from_all_pages(test_url)
-print(spisok)
-write_info_to_db(spisok, 'test_cars')
+def check_capture(url):
+    driver.get(url)
+    try:
+        check_robot = driver.find_elements(by=By.XPATH,
+                                     value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
+        if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
+            print('Обнаружена капча')
+    except:
+        print('Все норм')
+
+check_capture(test_url)
+#spisok = get_car_info_from_all_pages(test_url)
+#print(spisok)
+#write_info_to_db(spisok, 'test_cars')
 
 # driver.close()
