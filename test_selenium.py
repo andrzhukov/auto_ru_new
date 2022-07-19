@@ -1,4 +1,5 @@
 from seleniumwire.webdriver import Chrome
+from seleniumwire.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 import sqlite3
 import time
@@ -6,9 +7,10 @@ import random
 
 # driver for Google Chrome
 # for mac
-webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
-#webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
+#webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
+webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 driver = Chrome(webdriver)
+chrome_options = ChromeOptions()
 
 # Creating database and cursor
 dbase = sqlite3.connect('auto_ru_cars.db')
@@ -20,13 +22,6 @@ test_url = 'https://auto.ru/moskva/cars/bmw/3er/all/?top_days=1&year_from=2018&y
 # TEST - Creating test table
 dbase.execute('CREATE TABLE IF NOT EXISTS {}(Name, Link, Engine_Power, Year, Mileage, Price, Photo, Owner)'.format('test_cars'))
 dbase.commit()
-
-# This function choose one of the user-agents from file 
-def choose_random_user_agent():
-    with open('UserAgents.txt', 'r') as file:
-        agents = file.read().splitlines()
-    user_agent = random.choice(agents)
-    return user_agent
 
 # Creating headers for request to auto.ru
 def interceptor(request):
@@ -69,12 +64,12 @@ def interceptor(request):
                 _ym_d=1648409987; \
                 cycada=nqH7+oUJczCSw/SzGMoOECKCXlp5wIMqb89bi8TJjIo='
     request.headers['Host'] = 'auto.ru'
-    #request.headers['User-Agent'] = 'Googlebot/2.1 (+http://www.google.com/bot.html)'
+    request.headers['User-Agent'] = 'Googlebot/2.1 (+http://www.google.com/bot.html)'
     #request.headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
-    #ag = choose_random_user_agent()
-    #print(ag)
-    #print('####')
-    #request.headers['User-Agent'] = ag
+    # ag = choose_random_user_agent()
+    # print(ag)
+    # print('####')
+    # request.headers['User-Agent'] = ag
 
 driver.request_interceptor = interceptor
 # driver.get(url)
@@ -193,29 +188,58 @@ def get_photo_owner(car_lst):
 # This function check Yandex capture and returns True or False
 def check_capture(url):
     driver.get(url)
-    status = True
-    try:
-        check_robot = driver.find_elements(by=By.XPATH,
-                                     value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
-        if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
-            #print('Обнаружена капча')
-            status = False
-    except:
-        #print('Все норм')
-        status = True
-    return status
+    #status = True
+    while True:
+        try:
+            check_robot = driver.find_elements(by=By.XPATH,
+                                         value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
+            if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
+                print('Обнаружена капча')
+                choose_random_user_agent()
+                #status = False
+        except:
+            print('Все норм')
+            break
+           # status = True
+    return
 
-
+# This function choose one of the user-agents from file
+def choose_random_user_agent():
+    with open('UserAgents.txt', 'r') as file:
+        agents = file.read().splitlines()
+    user_agent = random.choice(agents)
+    print(user_agent)
+    chrome_options.add_argument('--user-agent="' + user_agent +'"')
+    global driver
+    driver = Chrome(webdriver, chrome_options=chrome_options)
+    return
 
 ############################
 
+#chrome_options.add_argument('--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"')
+#driver = Chrome(webdriver, chrome_options=chrome_options)
+# agent=driver.execute_script("return navigator.userAgent")
+# print(str(agent))
+# print(get_car_info_from_all_pages(test_url))
+# driver.get(test_url)
+# print('########')
+# choose_random_user_agent()
+# driver.get(test_url)
+# agent=driver.execute_script("return navigator.userAgent")
+# print(str(agent))
 
+check_capture(test_url)
+spisok = get_car_info_from_all_pages(test_url)
+print(spisok)
 
-if check_capture(test_url):
-    spisok = get_car_info_from_all_pages(test_url)
-    print(spisok)
-else:
-    print('Обнаружена капча')
+# while True:
+#     if check_capture(test_url):
+#         spisok = get_car_info_from_all_pages(test_url)
+#         print(spisok)
+#         break
+#     else:
+#         print('Обнаружена заглушка')
+#         choose_random_user_agent()
 #write_info_to_db(spisok, 'test_cars')
 
 # driver.close()
