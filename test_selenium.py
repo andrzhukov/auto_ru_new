@@ -21,7 +21,7 @@ test_url = 'https://auto.ru/moskva/cars/bmw/3er/all/?top_days=1&year_from=2018&y
 dbase.execute('CREATE TABLE IF NOT EXISTS {}(Name, Link, Engine_Power, Year, Mileage, Price, Photo, Owner)'.format('test_cars'))
 dbase.commit()
 
-# This function choose one of the user-agents from file
+# This function choose one of the user-agents from file 
 def choose_random_user_agent():
     with open('UserAgents.txt', 'r') as file:
         agents = file.read().splitlines()
