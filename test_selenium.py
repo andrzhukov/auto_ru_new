@@ -147,7 +147,7 @@ def get_car_info_from_all_pages(url):
         total_cars_info += get_car_info_from_page(page_url)
     return total_cars_info
 
-# This function write information about cars from list to database
+# This function write information about cars from list to database x
 def write_info_to_db(car_lst, tablename):
     cur.executemany('INSERT INTO {} VALUES(?, ?, ?, ?, ?, ?, ?, ?)'.format(tablename), car_lst)
     dbase.commit()
