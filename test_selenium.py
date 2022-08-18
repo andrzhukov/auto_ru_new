@@ -1,4 +1,5 @@
 from seleniumwire.webdriver import Chrome
+from seleniumwire.webdriver import Firefox
 from seleniumwire.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 import sqlite3
@@ -8,8 +9,11 @@ import random
 # driver for Google Chrome
 # for mac
 #webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
+# for windows
 webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
+firefoxdriver = r'C:/Users/AZhukov/Desktop/Work/Python/Carpost/geckodriver'
 driver = Chrome(webdriver)
+fdriver = Firefox(executable_path=firefoxdriver)
 chrome_options = ChromeOptions()
 
 # Creating database and cursor
@@ -72,6 +76,7 @@ def interceptor(request):
     # request.headers['User-Agent'] = ag
 
 driver.request_interceptor = interceptor
+fdriver.request_interceptor = interceptor
 # driver.get(url)
 
 # This function for getting total number of pages for current search
@@ -187,10 +192,12 @@ def get_photo_owner(car_lst):
 
 # This function check Yandex capture and returns True or False
 def check_capture(url):
-    driver.get(url)
+    #driver.get(url)
+    #time.sleep(10)
     #status = True
     while True:
         try:
+            driver.get(url)
             check_robot = driver.find_elements(by=By.XPATH,
                                          value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
             if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
@@ -208,6 +215,7 @@ def choose_random_user_agent():
     with open('UserAgents.txt', 'r') as file:
         agents = file.read().splitlines()
     user_agent = random.choice(agents)
+    print('выбираем юзер агента')
     print(user_agent)
     chrome_options.add_argument('--user-agent="' + user_agent +'"')
     global driver
@@ -228,9 +236,8 @@ def choose_random_user_agent():
 # agent=driver.execute_script("return navigator.userAgent")
 # print(str(agent))
 
-check_capture(test_url)
-spisok = get_car_info_from_all_pages(test_url)
-print(spisok)
+#check_capture(test_url)
+fdriver.get(test_url)
 
 # while True:
 #     if check_capture(test_url):
