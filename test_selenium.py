@@ -1,6 +1,7 @@
 from seleniumwire.webdriver import Chrome
 from seleniumwire.webdriver import Firefox
-from seleniumwire.webdriver import ChromeOptions
+from seleniumwire.webdriver import ChromeOptions, FirefoxOptions
+#from seleniumwire.webdriver.Firefox import Options
 from selenium.webdriver.common.by import By
 import sqlite3
 import time
@@ -12,9 +13,10 @@ import random
 # for windows
 webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 firefoxdriver = r'C:/Users/AZhukov/Desktop/Work/Python/Carpost/geckodriver'
-driver = Chrome(webdriver)
+#driver = Chrome(webdriver)
 fdriver = Firefox(executable_path=firefoxdriver)
 chrome_options = ChromeOptions()
+options = FirefoxOptions()
 
 # Creating database and cursor
 dbase = sqlite3.connect('auto_ru_cars.db')
@@ -75,7 +77,7 @@ def interceptor(request):
     # print('####')
     # request.headers['User-Agent'] = ag
 
-driver.request_interceptor = interceptor
+#driver.request_interceptor = interceptor
 fdriver.request_interceptor = interceptor
 # driver.get(url)
 
@@ -197,8 +199,13 @@ def check_capture(url):
     #status = True
     while True:
         try:
-            driver.get(url)
-            check_robot = driver.find_elements(by=By.XPATH,
+            #driver.get(url)
+
+            fdriver.get(url)
+            agent=fdriver.execute_script("return navigator.userAgent")
+            print('Used Agent: ' + str(agent))
+            time.sleep(5)
+            check_robot = fdriver.find_elements(by=By.XPATH,
                                          value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
             if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
                 print('Обнаружена капча')
@@ -217,9 +224,12 @@ def choose_random_user_agent():
     user_agent = random.choice(agents)
     print('выбираем юзер агента')
     print(user_agent)
-    chrome_options.add_argument('--user-agent="' + user_agent +'"')
-    global driver
-    driver = Chrome(webdriver, chrome_options=chrome_options)
+    #chrome_options.add_argument('--user-agent="' + user_agent +'"')
+    options.set_preference("general.useragent.override", user_agent)
+    #global driver
+    global fdriver
+    #driver = Chrome(webdriver, chrome_options=chrome_options)
+    fdriver = Firefox(executable_path=firefoxdriver, options=options)
     return
 
 ############################
@@ -236,7 +246,7 @@ def choose_random_user_agent():
 # agent=driver.execute_script("return navigator.userAgent")
 # print(str(agent))
 
-#check_capture(test_url)
+check_capture(test_url)
 fdriver.get(test_url)
 
 # while True:
