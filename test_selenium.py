@@ -9,7 +9,7 @@ import time
 import random
 
 # driver for Google Chrome
-# for mac
+# for macos
 #webdriver = '/Users/andrejzukov/PycharmProjects/pythonProject4/chromedriver/chromedriver'
 # for windows
 webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
