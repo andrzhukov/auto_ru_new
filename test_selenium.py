@@ -1,6 +1,7 @@
 from seleniumwire.webdriver import Chrome
 from seleniumwire.webdriver import Firefox
 from seleniumwire.webdriver import ChromeOptions, FirefoxOptions
+from fake_useragent import UserAgent
 #from seleniumwire.webdriver.Firefox import Options
 from selenium.webdriver.common.by import By
 import sqlite3
@@ -13,8 +14,12 @@ import random
 # for windows
 webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 firefoxdriver = r'C:/Users/AZhukov/Desktop/Work/Python/Carpost/geckodriver'
+extension_dir = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/'
+extensions = ['ublock_origin-1.44.0.xpi']
 #driver = Chrome(webdriver)
 fdriver = Firefox(executable_path=firefoxdriver)
+for extension in extensions:
+    fdriver.install_addon(extension_dir + extension, temporary=True)
 chrome_options = ChromeOptions()
 options = FirefoxOptions()
 
@@ -221,11 +226,14 @@ def check_capture(url):
 def choose_random_user_agent():
     with open('UserAgents.txt', 'r') as file:
         agents = file.read().splitlines()
-    user_agent = random.choice(agents)
+    #user_agent = random.choice(agents)
+    ua = UserAgent()
+    user_agent = ua.random
     print('выбираем юзер агента')
     print(user_agent)
     #chrome_options.add_argument('--user-agent="' + user_agent +'"')
     options.set_preference("general.useragent.override", user_agent)
+    options.headless = True #disable this option for testing pages
     #global driver
     global fdriver
     #driver = Chrome(webdriver, chrome_options=chrome_options)
@@ -248,6 +256,33 @@ def choose_random_user_agent():
 
 check_capture(test_url)
 fdriver.get(test_url)
+#test
+cars_from_page = []
+car_names = fdriver.find_elements(by=By.XPATH,
+                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//a[@class="Link ListingItemTitle__link"]')
+car_links = fdriver.find_elements(by=By.XPATH,
+                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="Link ListingItemTitle__link"]')
+car_engines = fdriver.find_elements(by=By.XPATH,
+                                   value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemTechSummaryDesktop__cell"]')
+car_years = fdriver.find_elements(by=By.XPATH,
+                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__year"]')
+car_mileages = fdriver.find_elements(by=By.XPATH,
+                                    value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__kmAge"]')
+car_prices = fdriver.find_elements(by=By.XPATH,
+                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemPrice__content"]')
+car_engines_clear = []
+for engine in car_engines:
+    if "л.с." in engine.text:
+        car_engines_clear.append(engine.text)
+    else:
+        continue
+for idx in range(len(car_engines_clear)):
+    car_engines_clear[idx] = car_engines_clear[idx].replace('\u2009/\u2009', ' | ')
+for i in range(len(car_names)):
+    cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
+                           car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
+print(cars_from_page)
+print(len(cars_from_page))
 
 # while True:
 #     if check_capture(test_url):
