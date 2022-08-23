@@ -1,6 +1,7 @@
 from seleniumwire.webdriver import Chrome
 from seleniumwire.webdriver import Firefox
 from seleniumwire.webdriver import ChromeOptions, FirefoxOptions
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 from fake_useragent import UserAgent
 #from seleniumwire.webdriver.Firefox import Options
 from selenium.webdriver.common.by import By
@@ -254,35 +255,75 @@ def choose_random_user_agent():
 # agent=driver.execute_script("return navigator.userAgent")
 # print(str(agent))
 
-check_capture(test_url)
-fdriver.get(test_url)
+#check_capture(test_url)
+#fdriver.get(test_url)
+
+def get_free_proxies():
+    fdriver.get('https://sslproxies.org')
+    table = fdriver.find_element(By.TAG_NAME, 'table')
+    thead = table.find_element(By.TAG_NAME, 'thead').find_elements(By.TAG_NAME, 'th')
+    tbody = table.find_element(By.TAG_NAME, 'tbody').find_elements(By.TAG_NAME, 'tr')
+    headers = []
+    for th in thead:
+        headers.append(th.text.strip())
+    proxies = []
+    for tr in tbody:
+        proxy_data = {}
+        tds = tr.find_elements(By.TAG_NAME, 'td')
+        for i in range(len(headers)):
+            proxy_data[headers[i]] = tds[i].text.strip()
+        proxies.append(proxy_data)
+    return proxies
+free_proxies = get_free_proxies()
+print(free_proxies)
+def set_new_proxy(proxy_list):
+    proxy_idx = random.randint(0, len(proxy_list)-1)
+    print(proxy_idx)
+    NewProxy = proxy_list[proxy_idx]['IP Address'] + ':' + proxy_list[proxy_idx]['Port']
+    print(NewProxy)
+    proxy = Proxy({
+        'proxyType': ProxyType.MANUAL,
+        'httpProxy': NewProxy,
+        'ftpProxy': NewProxy,
+        'sslProxy': NewProxy,
+        'noProxy': ''  # set this value as desired
+    })
+    global fdriver
+    fdriver = Firefox(executable_path=firefoxdriver, proxy=proxy)
+    return
+set_new_proxy(free_proxies)
+fdriver.get('https://2ip.ru/')
+time.sleep(10)
+set_new_proxy(free_proxies)
+fdriver.get('https://2ip.ru/')
+
 #test
-cars_from_page = []
-car_names = fdriver.find_elements(by=By.XPATH,
-                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//a[@class="Link ListingItemTitle__link"]')
-car_links = fdriver.find_elements(by=By.XPATH,
-                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="Link ListingItemTitle__link"]')
-car_engines = fdriver.find_elements(by=By.XPATH,
-                                   value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemTechSummaryDesktop__cell"]')
-car_years = fdriver.find_elements(by=By.XPATH,
-                                 value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__year"]')
-car_mileages = fdriver.find_elements(by=By.XPATH,
-                                    value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__kmAge"]')
-car_prices = fdriver.find_elements(by=By.XPATH,
-                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemPrice__content"]')
-car_engines_clear = []
-for engine in car_engines:
-    if "л.с." in engine.text:
-        car_engines_clear.append(engine.text)
-    else:
-        continue
-for idx in range(len(car_engines_clear)):
-    car_engines_clear[idx] = car_engines_clear[idx].replace('\u2009/\u2009', ' | ')
-for i in range(len(car_names)):
-    cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
-                           car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
-print(cars_from_page)
-print(len(cars_from_page))
+# cars_from_page = []
+# car_names = fdriver.find_elements(by=By.XPATH,
+#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//a[@class="Link ListingItemTitle__link"]')
+# car_links = fdriver.find_elements(by=By.XPATH,
+#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="Link ListingItemTitle__link"]')
+# car_engines = fdriver.find_elements(by=By.XPATH,
+#                                    value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemTechSummaryDesktop__cell"]')
+# car_years = fdriver.find_elements(by=By.XPATH,
+#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__year"]')
+# car_mileages = fdriver.find_elements(by=By.XPATH,
+#                                     value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__kmAge"]')
+# car_prices = fdriver.find_elements(by=By.XPATH,
+#                                   value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemPrice__content"]')
+# car_engines_clear = []
+# for engine in car_engines:
+#     if "л.с." in engine.text:
+#         car_engines_clear.append(engine.text)
+#     else:
+#         continue
+# for idx in range(len(car_engines_clear)):
+#     car_engines_clear[idx] = car_engines_clear[idx].replace('\u2009/\u2009', ' | ')
+# for i in range(len(car_names)):
+#     cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
+#                            car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
+# print(cars_from_page)
+# print(len(cars_from_page))
 
 # while True:
 #     if check_capture(test_url):
