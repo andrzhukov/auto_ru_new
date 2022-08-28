@@ -1,6 +1,6 @@
 from seleniumwire.webdriver import Chrome
 from seleniumwire.webdriver import Firefox
-from seleniumwire.webdriver import ChromeOptions, FirefoxOptions
+from seleniumwire.webdriver import ChromeOptions, FirefoxOptions, DesiredCapabilities
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from fake_useragent import UserAgent
 #from seleniumwire.webdriver.Firefox import Options
@@ -17,12 +17,14 @@ webdriver = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/chromedriver'
 firefoxdriver = r'C:/Users/AZhukov/Desktop/Work/Python/Carpost/geckodriver'
 extension_dir = 'C:/Users/AZhukov/Desktop/Work/Python/Carpost/'
 extensions = ['ublock_origin-1.44.0.xpi']
+options = FirefoxOptions()
 #driver = Chrome(webdriver)
 fdriver = Firefox(executable_path=firefoxdriver)
 for extension in extensions:
     fdriver.install_addon(extension_dir + extension, temporary=True)
 chrome_options = ChromeOptions()
-options = FirefoxOptions()
+
+
 
 # Creating database and cursor
 dbase = sqlite3.connect('auto_ru_cars.db')
@@ -281,21 +283,33 @@ def set_new_proxy(proxy_list):
     print(proxy_idx)
     NewProxy = proxy_list[proxy_idx]['IP Address'] + ':' + proxy_list[proxy_idx]['Port']
     print(NewProxy)
-    proxy = Proxy({
-        'proxyType': ProxyType.MANUAL,
-        'httpProxy': NewProxy,
-        'ftpProxy': NewProxy,
-        'sslProxy': NewProxy,
-        'noProxy': ''  # set this value as desired
-    })
+    sw_options = {
+        'proxy':{
+            'http': 'http://158.69.185.37:3129',
+            'https': 'https://158.69.185.37:3129',
+            'no_proxy': 'localhost,127.0.0.1'
+        }
+    }
+    # firefox_capabilities = DesiredCapabilities.FIREFOX
+    # firefox_capabilities['marionette'] = True
+    # NewProxy = '179.127.182.55:3128'
+    # firefox_capabilities['proxy'] = {
+    #     "proxyType": "MANUAL",
+    #     "httpProxy": 'http://179.127.182.55:3128',
+    #     "ftpProxy": NewProxy,
+    #     "sslProxy": NewProxy
+    # }
     global fdriver
-    fdriver = Firefox(executable_path=firefoxdriver, proxy=proxy)
+    fdriver = Firefox(executable_path=firefoxdriver, seleniumwire_options=sw_options)
     return
 set_new_proxy(free_proxies)
 fdriver.get('https://2ip.ru/')
+print(fdriver.capabilities['proxy'])
+fdriver.close()
 time.sleep(10)
 set_new_proxy(free_proxies)
 fdriver.get('https://2ip.ru/')
+print(fdriver.capabilities['proxy'])
 
 #test
 # cars_from_page = []
