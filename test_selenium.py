@@ -208,7 +208,6 @@ def check_capture(url):
     while True:
         try:
             #driver.get(url)
-
             fdriver.get(url)
             agent=fdriver.execute_script("return navigator.userAgent")
             print('Used Agent: ' + str(agent))
@@ -236,7 +235,7 @@ def choose_random_user_agent():
     print(user_agent)
     #chrome_options.add_argument('--user-agent="' + user_agent +'"')
     options.set_preference("general.useragent.override", user_agent)
-    options.headless = True #disable this option for testing pages
+    #options.headless = True #disable this option for testing pages
     #global driver
     global fdriver
     #driver = Chrome(webdriver, chrome_options=chrome_options)
@@ -257,59 +256,9 @@ def choose_random_user_agent():
 # agent=driver.execute_script("return navigator.userAgent")
 # print(str(agent))
 
-#check_capture(test_url)
-#fdriver.get(test_url)
+check_capture(test_url)
+fdriver.get(test_url)
 
-def get_free_proxies():
-    fdriver.get('https://sslproxies.org')
-    table = fdriver.find_element(By.TAG_NAME, 'table')
-    thead = table.find_element(By.TAG_NAME, 'thead').find_elements(By.TAG_NAME, 'th')
-    tbody = table.find_element(By.TAG_NAME, 'tbody').find_elements(By.TAG_NAME, 'tr')
-    headers = []
-    for th in thead:
-        headers.append(th.text.strip())
-    proxies = []
-    for tr in tbody:
-        proxy_data = {}
-        tds = tr.find_elements(By.TAG_NAME, 'td')
-        for i in range(len(headers)):
-            proxy_data[headers[i]] = tds[i].text.strip()
-        proxies.append(proxy_data)
-    return proxies
-free_proxies = get_free_proxies()
-print(free_proxies)
-def set_new_proxy(proxy_list):
-    proxy_idx = random.randint(0, len(proxy_list)-1)
-    print(proxy_idx)
-    NewProxy = proxy_list[proxy_idx]['IP Address'] + ':' + proxy_list[proxy_idx]['Port']
-    print(NewProxy)
-    sw_options = {
-        'proxy':{
-            'http': 'http://158.69.185.37:3129',
-            'https': 'https://158.69.185.37:3129',
-            'no_proxy': 'localhost,127.0.0.1'
-        }
-    }
-    # firefox_capabilities = DesiredCapabilities.FIREFOX
-    # firefox_capabilities['marionette'] = True
-    # NewProxy = '179.127.182.55:3128'
-    # firefox_capabilities['proxy'] = {
-    #     "proxyType": "MANUAL",
-    #     "httpProxy": 'http://179.127.182.55:3128',
-    #     "ftpProxy": NewProxy,
-    #     "sslProxy": NewProxy
-    # }
-    global fdriver
-    fdriver = Firefox(executable_path=firefoxdriver, seleniumwire_options=sw_options)
-    return
-set_new_proxy(free_proxies)
-fdriver.get('https://2ip.ru/')
-print(fdriver.capabilities['proxy'])
-fdriver.close()
-time.sleep(10)
-set_new_proxy(free_proxies)
-fdriver.get('https://2ip.ru/')
-print(fdriver.capabilities['proxy'])
 
 #test
 # cars_from_page = []
