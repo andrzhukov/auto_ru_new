@@ -91,8 +91,9 @@ fdriver.request_interceptor = interceptor
 
 # This function for getting total number of pages for current search
 def get_page_number(first_url):
-    driver.get(first_url)
-    pages = driver.find_elements(by=By.XPATH,
+    check_capture(first_url)
+    fdriver.get(first_url)
+    pages = fdriver.find_elements(by=By.XPATH,
                                  value='//*[@class="Button Button_color_whiteHoverBlue Button_size_s Button_type_link Button_width_default ListingPagination__page"]')
     try:
         numbers_of_pages = int(pages[-1].get_attribute('href').split('page=')[1])
@@ -121,19 +122,20 @@ def create_page_link_list(global_url, page_number):
 # This function create list that include information about cars from the page
 def get_car_info_from_page(page_url):
     time.sleep(random.random())
-    driver.get(page_url)
+    check_capture(page_url)
+    fdriver.get(page_url)
     cars_from_page = []
-    car_names = driver.find_elements(by=By.XPATH,
+    car_names = fdriver.find_elements(by=By.XPATH,
                                            value='//div[@class = "ListingCars ListingCars_outputType_list"]//a[@class="Link ListingItemTitle__link"]')
-    car_links = driver.find_elements(by=By.XPATH,
+    car_links = fdriver.find_elements(by=By.XPATH,
                                            value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="Link ListingItemTitle__link"]')
-    car_engines = driver.find_elements(by=By.XPATH,
+    car_engines = fdriver.find_elements(by=By.XPATH,
                                            value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemTechSummaryDesktop__cell"]')
-    car_years = driver.find_elements(by=By.XPATH,
+    car_years = fdriver.find_elements(by=By.XPATH,
                                            value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__year"]')
-    car_mileages = driver.find_elements(by=By.XPATH,
+    car_mileages = fdriver.find_elements(by=By.XPATH,
                                      value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__kmAge"]')
-    car_prices = driver.find_elements(by=By.XPATH,
+    car_prices = fdriver.find_elements(by=By.XPATH,
                                       value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemPrice__content"]')
     car_engines_clear = []
     for engine in car_engines:
@@ -190,55 +192,44 @@ def check_new_ads(url, tablename):
 # This function gets photo and owner information from the ads in the list
 def get_photo_owner(car_lst):
     for item in car_lst:
-        driver.get(item[1])
-        photo_links = driver.find_elements(by=By.XPATH,
+        fdriver.get(item[1])
+        photo_links = fdriver.find_elements(by=By.XPATH,
                                             value='//div[@class = "ImageGalleryDesktop__itemContainer"]//img[@class="ImageGalleryDesktop__image"]')
-        owner_quantity = driver.find_elements(by=By.XPATH,
+        owner_quantity = fdriver.find_elements(by=By.XPATH,
                                            value='//li[@class = "CardInfoRow CardInfoRow_ownersCount"]//span[@class="CardInfoRow__cell"]')
         item[6] = photo_links[0].get_attribute('src')
         item[7] = owner_quantity[1].text
-    driver.close()
+    fdriver.close()
     return car_lst
 
 # This function check Yandex capture and returns True or False
 def check_capture(url):
-    #driver.get(url)
-    #time.sleep(10)
-    #status = True
     while True:
         try:
-            #driver.get(url)
             fdriver.get(url)
-            agent=fdriver.execute_script("return navigator.userAgent")
-            print('Used Agent: ' + str(agent))
-            time.sleep(5)
+            #agent=fdriver.execute_script("return navigator.userAgent")
+            #print('Used Agent: ' + str(agent))
+            time.sleep(random.randint(3, 8))
             check_robot = fdriver.find_elements(by=By.XPATH,
                                          value='//span[@class="Text Text_weight_medium Text_typography_headline-s"]')
             if ('Подтвердите' in check_robot[0].text) or ('робот' in check_robot[0].text):
-                print('Обнаружена капча')
+                #print('Обнаружена капча')
                 choose_random_user_agent()
-                #status = False
         except:
-            print('Все норм')
-            break
-           # status = True
-    return
+            #print('Все норм')
+            return True
 
 # This function choose one of the user-agents from file
 def choose_random_user_agent():
     with open('UserAgents.txt', 'r') as file:
         agents = file.read().splitlines()
-    #user_agent = random.choice(agents)
     ua = UserAgent()
     user_agent = ua.random
-    print('выбираем юзер агента')
-    print(user_agent)
-    #chrome_options.add_argument('--user-agent="' + user_agent +'"')
+    #print('выбираем юзер агента')
+    #print(user_agent)
     options.set_preference("general.useragent.override", user_agent)
-    #options.headless = True #disable this option for testing pages
-    #global driver
+    options.headless = True# disable this option for testing pages
     global fdriver
-    #driver = Chrome(webdriver, chrome_options=chrome_options)
     fdriver = Firefox(executable_path=firefoxdriver, options=options)
     return
 
@@ -256,8 +247,7 @@ def choose_random_user_agent():
 # agent=driver.execute_script("return navigator.userAgent")
 # print(str(agent))
 
-check_capture(test_url)
-fdriver.get(test_url)
+print(get_car_info_from_all_pages(test_url))
 
 
 #test
