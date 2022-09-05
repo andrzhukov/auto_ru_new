@@ -145,6 +145,9 @@ def get_car_info_from_page(page_url):
             continue
     for idx in range(len(car_engines_clear)):
         car_engines_clear[idx] = car_engines_clear[idx].replace('\u2009/\u2009', ' | ')
+    for name in car_names:
+        print(name.text)
+    print(len(car_names))
     for i in range(len(car_names)):
         cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
                                car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
@@ -192,6 +195,7 @@ def check_new_ads(url, tablename):
 # This function gets photo and owner information from the ads in the list
 def get_photo_owner(car_lst):
     for item in car_lst:
+        check_capture(item[1])
         fdriver.get(item[1])
         photo_links = fdriver.find_elements(by=By.XPATH,
                                             value='//div[@class = "ImageGalleryDesktop__itemContainer"]//img[@class="ImageGalleryDesktop__image"]')
@@ -228,64 +232,14 @@ def choose_random_user_agent():
     #print('выбираем юзер агента')
     #print(user_agent)
     options.set_preference("general.useragent.override", user_agent)
-    options.headless = True# disable this option for testing pages
+   # options.headless = True# disable this option for testing pages
     global fdriver
     fdriver = Firefox(executable_path=firefoxdriver, options=options)
     return
 
 ############################
 
-#chrome_options.add_argument('--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"')
-#driver = Chrome(webdriver, chrome_options=chrome_options)
-# agent=driver.execute_script("return navigator.userAgent")
-# print(str(agent))
-# print(get_car_info_from_all_pages(test_url))
-# driver.get(test_url)
-# print('########')
-# choose_random_user_agent()
-# driver.get(test_url)
-# agent=driver.execute_script("return navigator.userAgent")
-# print(str(agent))
 
 print(get_car_info_from_all_pages(test_url))
 
-
-#test
-# cars_from_page = []
-# car_names = fdriver.find_elements(by=By.XPATH,
-#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//a[@class="Link ListingItemTitle__link"]')
-# car_links = fdriver.find_elements(by=By.XPATH,
-#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="Link ListingItemTitle__link"]')
-# car_engines = fdriver.find_elements(by=By.XPATH,
-#                                    value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemTechSummaryDesktop__cell"]')
-# car_years = fdriver.find_elements(by=By.XPATH,
-#                                  value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__year"]')
-# car_mileages = fdriver.find_elements(by=By.XPATH,
-#                                     value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItem__kmAge"]')
-# car_prices = fdriver.find_elements(by=By.XPATH,
-#                                   value='//div[@class = "ListingCars ListingCars_outputType_list"]//*[@class="ListingItemPrice__content"]')
-# car_engines_clear = []
-# for engine in car_engines:
-#     if "л.с." in engine.text:
-#         car_engines_clear.append(engine.text)
-#     else:
-#         continue
-# for idx in range(len(car_engines_clear)):
-#     car_engines_clear[idx] = car_engines_clear[idx].replace('\u2009/\u2009', ' | ')
-# for i in range(len(car_names)):
-#     cars_from_page.append([car_names[i].text, car_links[i].get_attribute('href'), car_engines_clear[i],
-#                            car_years[i].text, car_mileages[i].text, car_prices[i].text, 'No Photo', 'No Owner'])
-# print(cars_from_page)
-# print(len(cars_from_page))
-
-# while True:
-#     if check_capture(test_url):
-#         spisok = get_car_info_from_all_pages(test_url)
-#         print(spisok)
-#         break
-#     else:
-#         print('Обнаружена заглушка')
-#         choose_random_user_agent()
-#write_info_to_db(spisok, 'test_cars')
-
-# driver.close()
+# fdriver.close()
