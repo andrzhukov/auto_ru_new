@@ -31,7 +31,7 @@ dbase = sqlite3.connect('auto_ru_cars.db')
 cur = dbase.cursor()
 
 # TEST - test url
-test_url = 'https://auto.ru/moskva/cars/bmw/3er/all/?top_days=1&year_from=2018&year_to=2019'
+test_url = 'https://auto.ru/moskva/cars/bmw/5er/all/?top_days=1&year_from=2018&year_to=2020'
 
 # TEST - Creating test table
 dbase.execute('CREATE TABLE IF NOT EXISTS {}(Name, Link, Engine_Power, Year, Mileage, Price, Photo, Owner)'.format('test_cars'))
@@ -177,6 +177,7 @@ def write_info_to_db(car_lst, tablename):
 # It returns new ads as a result of comparison,
 def check_new_ads(url, tablename):
     req = cur.execute('SELECT * FROM {}'.format(tablename)).fetchall()
+    check_capture(url)
     last_ads = get_car_info_from_all_pages(url)
     new_ads = []
     for ad in last_ads:
@@ -195,14 +196,17 @@ def check_new_ads(url, tablename):
 # This function gets photo and owner information from the ads in the list
 def get_photo_owner(car_lst):
     for item in car_lst:
-        check_capture(item[1])
+       #check_capture(item[1])
         fdriver.get(item[1])
         photo_links = fdriver.find_elements(by=By.XPATH,
                                             value='//div[@class = "ImageGalleryDesktop__itemContainer"]//img[@class="ImageGalleryDesktop__image"]')
         owner_quantity = fdriver.find_elements(by=By.XPATH,
                                            value='//li[@class = "CardInfoRow CardInfoRow_ownersCount"]//span[@class="CardInfoRow__cell"]')
         item[6] = photo_links[0].get_attribute('src')
-        item[7] = owner_quantity[1].text
+        try:
+            item[7] = owner_quantity[1].text
+        except:
+            item[7] = "нет данных"
     fdriver.close()
     return car_lst
 
@@ -240,6 +244,13 @@ def choose_random_user_agent():
 ############################
 
 
-print(get_car_info_from_all_pages(test_url))
+#test_list = get_car_info_from_all_pages(test_url)
+
+#full_list = get_photo_owner(test_list)
+
+new_cars = check_new_ads(test_url, 'test_cars')
+full_new_cars = get_photo_owner(new_cars)
+print(full_new_cars)
+write_info_to_db(full_new_cars, 'test_cars')
 
 # fdriver.close()
