@@ -1,1 +1,1 @@
-from keyboards.client_kb import main_kb, car_kb
+from keyboards.client_kb import main_kb, car_kb, inl_kb

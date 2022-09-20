@@ -1,11 +1,11 @@
 import asyncio
 import logging
-import os, hashlib
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
-from keyboards import main_kb, car_kb
+from keyboards import main_kb, car_kb, inl_kb
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import InputTextMessageContent, InlineQueryResultArticle
 from aiogram.types import update
 from search import Searcher
@@ -15,7 +15,7 @@ API_TOKEN = '5206470113:AAFmrSKFiTOk9GnsQ69cw8YtXIz5cIZuO50'
 # webhook settings
 WEBHOOK_HOST = 'https://your.domain'
 WEBHOOK_PATH = ''
-WEBHOOK_URL = 'https://27d0-62-217-188-253.eu.ngrok.io'
+WEBHOOK_URL = 'https://79a2-62-217-188-253.eu.ngrok.io'
 
 # webserver settings
 WEBAPP_HOST = '127.0.0.1'  # or ip
@@ -24,8 +24,10 @@ WEBAPP_PORT = 5001
 logging.basicConfig(level=logging.INFO)
 
 loop = asyncio.get_event_loop()
+storage = MemoryStorage()
 bot = Bot(token=API_TOKEN, loop=loop)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage= storage)
+
 #test brands for inline mode
 brands = ['BMW', 'Mercedes', 'Land Rover', 'KIA', 'Mitsubishi', 'Hyundai', 'Toyota', 'Audi', 'Honda', 'Haval',
           'Geely', 'Chery', 'Suzuki', 'LADA', 'Ford', 'Opel', 'Chevrolet', 'Jaguar', 'Citroen', 'Peugeout', 'Daewoo', 'EXEED',
@@ -45,12 +47,12 @@ async def command_start(message : types.Message):
 async def command_start(message : types.Message):
     print(message)
     await bot.send_message(message.chat.id, 'Настроим параметры поиска.\n\n'\
-                           'Выбери марку автомобиля.', reply_markup=car_kb)
+                           'Выбери марку автомобиля.', reply_markup=inl_kb)
 
 @dp.message_handler()
 async def echo(message: types.Message):
     print(message)
-    await bot.send_message(message.chat.id, message.text)
+    await bot.send_message(message.chat.id, 'Команда не распознана. Выберите дальнейшее действие.')
 
 
 
@@ -64,8 +66,6 @@ async def on_shutdown(dp):
     pass
 
 @dp.inline_handler()
-# async def inline_handler(query: types.InlineQuery):
-#     text = query.query or 'echo'
 async def inline_handler(query: update.InlineQuery):
     query_new = query.query
     query_new = query_new.rstrip().lower()
